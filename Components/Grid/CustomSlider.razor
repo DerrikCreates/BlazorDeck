@@ -1,0 +1,181 @@
+@using BlazorDeck.Components.Config
+@using BlazorDeck.Components.ExtentionMethods
+@using MudBlazor.Interop
+@using Color = System.Drawing.Color
+@implements IAsyncDisposable
+@inject IJSRuntime JS;
+@inject ClientInputInterop Input;
+
+<script>
+
+
+    getBoundingClientRectInterop = (element) => {
+        return element.getBoundingClientRect();
+    };
+
+</script>
+
+<style>
+
+    .slider {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+
+    }
+
+    .track {
+
+    }
+
+    .slider .track {
+        position: absolute;
+        background: #4a90e2;
+        border-radius: 3px;
+    }
+
+    .slider .thumb {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: #4a90e2;
+        border-radius: 50%;
+        cursor: grab;
+    }
+
+
+</style>
+
+<div @onpointerdown="@OnPointerDown" class=@($"slider {Class}") style="@Style; overflow: hidden" @ref="_root">
+    <div class="track"></div>
+    @if (Vertical)
+    {
+        <div
+            style="position: relative; width: 100%;height: @Percent%; background-color: @ForegroundColor; top: @(100 - Percent)%; "></div>
+        /*  <div class="thumb" style="bottom: @(Percent)%; left: 50%; transform: translate(-50%, 50%)"></div> */
+    }
+    else
+    {
+        <div
+            style="position: relative; width:@(Percent)%;height: 100%; background-color: @ForegroundColor;  "></div>
+        /*<div class="thumb" style="left: @(Percent)%;  top: 50%; transform: translate(-50%, -50%)"></div>*/
+    }
+</div>
+
+@code {
+
+    [Parameter] public float Percent { get; set; }
+    [Parameter] public PageConfig PageConfig { get; set; }
+    [Parameter] public ButtonConfig ButtonConfig { get; set; }
+    [Parameter] public bool Vertical { get; set; } = false;
+    [Parameter] public string Class { get; set; }
+    [Parameter] public string Style { get; set; }
+
+    [Parameter] public string ForegroundColor { get; set; } = Color.DarkBlue.ToHex();
+    [Parameter] public string BackgroundColor { get; set; } = Color.Gray.ToHex();
+
+    private ElementReference _root;
+    BoundingClientRect _boundingClientRect;
+
+    protected override Task OnInitializedAsync()
+    {
+        var gridColumn = $"{ButtonConfig.X} / {ButtonConfig.X + ButtonConfig.Width}";
+        var gridRow = $"{ButtonConfig.Y} / {ButtonConfig.Y + ButtonConfig.Height}";
+        Style = $"grid-column:{gridColumn}; grid-row:{gridRow}";
+        Vertical = ButtonConfig.Config["Vertical"].GetValue<bool>();
+        float percent = 0;
+        var percentMaybe = ButtonConfig.State["percent"]?.GetValue<float>();
+        if (percentMaybe is not null)
+        {
+            Percent = percentMaybe.Value;
+        }
+
+        ButtonConfig.OnStateChanged += OnButtonStateChanged;
+
+
+        return base.OnInitializedAsync();
+    }
+
+    private void OnButtonStateChanged()
+    {
+        var percentMaybe = ButtonConfig.State["percent"]?.GetValue<float>();
+        if (percentMaybe is not null)
+        {
+            Percent = percentMaybe.Value;
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+    }
+
+    double _currentPointerId = -1;
+
+    private async Task OnPointerDown(PointerEventArgs args)
+    {
+        _currentPointerId = args.PointerId;
+        _boundingClientRect = await JS.InvokeAsync<BoundingClientRect>("getBoundingClientRectInterop", _root);
+
+        Percent = MathF.Abs(CalculatePercent(args)) * 100;
+        ButtonConfig.State["percent"] = Percent;
+        ButtonConfig?.OnStateChanged.Invoke();
+        
+        Input.OnPointerMove += OnPointerMove;
+        Input.OnPointerUp += OnPointerUp;
+    }
+
+    private void OnPointerMove(PointerEventArgs move)
+    {
+        if (move.PointerId != _currentPointerId)
+        {
+            return;
+        }
+
+        Percent = MathF.Abs(CalculatePercent(move)) * 100;
+        ButtonConfig.State["percent"] = Percent;
+        ButtonConfig?.OnStateChanged.Invoke();
+    }
+
+    private float CalculatePercent(PointerEventArgs pointerEvent)
+    {
+        if (Vertical)
+        {
+            var mouseY = double.Clamp(pointerEvent.ClientY, _boundingClientRect.Top, _boundingClientRect.Bottom);
+            var offset = mouseY - _boundingClientRect.Bottom;
+            return (float)(offset / (_boundingClientRect.Bottom - _boundingClientRect.Top));
+        }
+        else
+        {
+            var mouseX = double.Clamp(pointerEvent.ClientX, _boundingClientRect.Left, _boundingClientRect.Right);
+            var offset = Math.Abs(mouseX - _boundingClientRect.Left);
+            return (float)(offset / (_boundingClientRect.Left - _boundingClientRect.Right));
+        }
+    }
+
+
+    private void OnPointerUp(PointerEventArgs up)
+    {
+        if (up.PointerId != _currentPointerId)
+        {
+            return;
+        }
+
+        Input.OnPointerMove -= OnPointerMove;
+        Input.OnPointerUp -= OnPointerUp;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Input != null) await Input.DisposeAsync();
+        ButtonConfig.OnStateChanged -= OnButtonStateChanged;
+    }
+
+}

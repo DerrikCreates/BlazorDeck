@@ -1,0 +1,60 @@
+{
+  "Id": "838a298e-c808-496a-951b-02053db43f93",
+  "Name": "Example",
+  "GridSizeX": 10,
+  "GridSizeY": 5,
+  "Buttons": [
+    {
+      "Id": "59efbf91-baf3-404c-bb3c-7e0f9d161eaf",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": true
+      },
+      "X": 3,
+      "Y": 1,
+      "Width": 1,
+      "Height": 4
+    },
+    {
+      "Id": "cc03378a-bcbf-4abe-a6f4-8a4aff3c8b86",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": true
+      },
+      "X": 2,
+      "Y": 1,
+      "Width": 1,
+      "Height": 4
+    },
+    {
+      "Id": "f93e6600-ec17-46b8-9542-3e8c9c3a6404",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": false
+      },
+      "X": 4,
+      "Y": 1,
+      "Width": 4,
+      "Height": 1
+    },
+    {
+      "Id": "f93e6600-ec17-46b8-9542-3e8c9c3a6404",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": false
+      },
+      "X": 1,
+      "Y": 5,
+      "Width": 9,
+      "Height": 1
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "Id": "838a298e-c808-496a-951b-02053db43f93",
+  "Name": "Example",
+  "GridSizeX": 8,
+  "GridSizeY": 4,
+  "Buttons": [
+    {
+      "Id": "59efbf91-baf3-404c-bb3c-7e0f9d161eaf",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": true
+      },
+      "State": {},
+      "X": 3,
+      "Y": 1,
+      "Width": 1,
+      "Height": 4
+    },
+    {
+      "Id": "cc03378a-bcbf-4abe-a6f4-8a4aff3c8b86",
+      "ButtonType": 1,
+      "BackgroundColor": "#000000",
+      "ForegroundColor": "#1A5FD8",
+      "Config": {
+        "Vertical": true
+      },
+      "State": {},
+      "X": 2,
+      "Y": 1,
+      "Width": 1,
+      "Height": 4
+    }
+  ]
+}

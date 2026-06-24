@@ -1,0 +1,15 @@
+@inject ClientInputInterop InputInterop
+@rendermode @(new InteractiveServerRenderMode(false))
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InputInterop.Init();
+        }
+    }
+
+   
+}

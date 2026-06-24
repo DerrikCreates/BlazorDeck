@@ -1,0 +1,96 @@
+@page "/grid"
+@using BlazorDeck.Components.Config
+@using BlazorDeck.Components.Grid
+@using ButtonType = BlazorDeck.Components.Config.ButtonType
+@layout GridLayout
+@inject IJSRuntime JS;
+@inject GridConfig GridConfig;
+@implements IAsyncDisposable
+@rendermode @(new InteractiveServerRenderMode(false))
+
+<script>
+    function goFullscreen() {
+        document.documentElement.requestFullscreen();
+    }
+</script>
+<style>
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(@CurrentPage.config.GridSizeX, 10vw);
+        grid-template-rows:  repeat(@CurrentPage.config.GridSizeY, 10vw);
+        grid-gap: 5px;
+    }
+
+    .cell {
+        background-color: gray;
+        justify-content: center;
+        align-content: center;
+    }
+
+</style>
+<button onclick="goFullscreen()">F</button>
+
+<div class="grid" style="overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important; height: 100%">
+    @foreach (var button in CurrentPage.config.Buttons)
+    {
+        if (button.ButtonType == ButtonType.Slider)
+        {
+            <CustomSlider ButtonConfig="@button" PageConfig="@CurrentPage.config"
+                          ForegroundColor="@button.ForegroundColor"></CustomSlider>
+        }
+    }
+</div>
+
+
+@code
+{
+
+    (string path, PageConfig config) CurrentPage;
+
+    protected override void OnInitialized()
+    {
+        var first = GridConfig.Pages.First();
+        OnPageChanged((first.Key, first.Value));
+    }
+
+    private void OnPageChanged((string path, PageConfig config) newPage)
+    {
+        if (CurrentPage.config is not null)
+        {
+            CurrentPage.config?.OnStateChanged -= PageStateChanged;
+        }
+
+        newPage.config.OnStateChanged += PageStateChanged;
+        CurrentPage = newPage;
+        CurrentPage.config.OnStateChanged?.Invoke();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+    }
+
+    private void OnPercentChange(float percent, ButtonConfig button)
+    {
+        button.State["percent"] = percent;
+        GridConfig.Save();
+
+        InvokeAsync((() => { CurrentPage.config.OnStateChanged?.Invoke(); }));
+    }
+
+    private void PageStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        CurrentPage.config.OnStateChanged -= PageStateChanged;
+    }
+}
+
+
