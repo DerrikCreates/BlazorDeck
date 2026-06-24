@@ -12,56 +12,18 @@
     getBoundingClientRectInterop = (element) => {
         return element.getBoundingClientRect();
     };
-
 </script>
 
-<style>
-
-    .slider {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        background: #ccc;
-        border-radius: 3px;
-        cursor: pointer;
-
-    }
-
-    .track {
-
-    }
-
-    .slider .track {
-        position: absolute;
-        background: #4a90e2;
-        border-radius: 3px;
-    }
-
-    .slider .thumb {
-        position: absolute;
-        width: 18px;
-        height: 18px;
-        background: #4a90e2;
-        border-radius: 50%;
-        cursor: grab;
-    }
-
-
-</style>
-
 <div @onpointerdown="@OnPointerDown" class=@($"slider {Class}") style="@Style; overflow: hidden" @ref="_root">
-    <div class="track"></div>
     @if (Vertical)
     {
-        <div
-            style="position: relative; width: 100%;height: @Percent%; background-color: @ForegroundColor; top: @(100 - Percent)%; "></div>
-        /*  <div class="thumb" style="bottom: @(Percent)%; left: 50%; transform: translate(-50%, 50%)"></div> */
+        <div class="bar"
+            style="width: 100%;height: @Percent%; background-color: @ForegroundColor; top: @(100 - Percent)%; "></div>
     }
     else
     {
-        <div
-            style="position: relative; width:@(Percent)%;height: 100%; background-color: @ForegroundColor;  "></div>
-        /*<div class="thumb" style="left: @(Percent)%;  top: 50%; transform: translate(-50%, -50%)"></div>*/
+        <div class="bar"
+            style="width: @(Percent)%;height: 100%; background-color: @ForegroundColor;  "></div>
     }
 </div>
 
@@ -110,13 +72,6 @@
         InvokeAsync(StateHasChanged);
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-        }
-    }
-
     double _currentPointerId = -1;
 
     private async Task OnPointerDown(PointerEventArgs args)
@@ -127,7 +82,7 @@
         Percent = MathF.Abs(CalculatePercent(args)) * 100;
         ButtonConfig.State["percent"] = Percent;
         ButtonConfig?.OnStateChanged.Invoke();
-        
+
         Input.OnPointerMove += OnPointerMove;
         Input.OnPointerUp += OnPointerUp;
     }
