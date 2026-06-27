@@ -1,0 +1,64 @@
+{
+  "BlazorDeckPages": [
+    {
+      "Id": "4a643052-cab5-4cd0-902c-a96d14cde78d",
+      "Name": "FUCKING WORK",
+      "GridSizeX": 8,
+      "GridSizeY": 4,
+      "Buttons": [
+        {
+          "Id": "28298a76-fffa-4f37-aeae-efa048a2c615",
+          "StreamerBotActionId": "f7a567db-bf60-40bc-9ca5-a29e5a9ebb73",
+          "ButtonType": 1,
+          "BackgroundColor": "#000000",
+          "ForegroundColor": "#1A5FD8",
+          "InteractColor": "#8B0000",
+          "Config": {
+            "$type": 1,
+            "Vertical": true
+          },
+          "X": 1,
+          "Y": 1,
+          "Width": 1,
+          "Height": 4
+        },
+        {
+          "Id": "5ba75eed-fdae-4565-ab28-e2aca0867e8c",
+          "StreamerBotActionId": "2b8750c1-38ba-4564-8daa-1d6afa79d86c",
+          "ButtonType": 0,
+          "BackgroundColor": "#000000",
+          "ForegroundColor": "#1A5FD8",
+          "InteractColor": "#8B0000",
+          "Config": {
+            "$type": 0,
+            "ActivateTime": 0,
+            "ActivateReadyColor": "#0000FF",
+            "ButtonCooldown": 1
+          },
+          "X": 2,
+          "Y": 2,
+          "Width": 1,
+          "Height": 1
+        },
+        {
+          "Id": "95e2f35b-b277-4e11-b8b0-88519505c051",
+          "StreamerBotActionId": "38eb0d7a-17e3-4651-93fc-a7aa5eee9d8f",
+          "ButtonType": 0,
+          "BackgroundColor": "#000000",
+          "ForegroundColor": "#1A5FD8",
+          "InteractColor": "#FFFF00",
+          "Config": {
+            "$type": 0,
+            "ActivateTime": 1000,
+            "ActivateReadyColor": "#0000FF",
+            "ButtonCooldown": 1
+          },
+          "X": 3,
+          "Y": 4,
+          "Width": 1,
+          "Height": 1
+        }
+      ]
+    }
+  ]
+}

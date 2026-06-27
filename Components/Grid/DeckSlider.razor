@@ -1,9 +1,15 @@
 @using BlazorDeck.Components.Config
+@using BlazorDeck.Components.Config.ButtonTypes
+@using BlazorDeck.Components.Config.States
 @using BlazorDeck.Components.ExtentionMethods
+@using BlazorDeck.Config.States
 @using MudBlazor.Interop
+@using StreamerbotClient
 @using Color = System.Drawing.Color
 @implements IAsyncDisposable
+@inherits DeckButtonBase
 @inject IJSRuntime JS;
+@inject Streamerbot StreamerbotClient
 @inject ClientInputInterop Input;
 
 <script>
@@ -18,44 +24,61 @@
     @if (Vertical)
     {
         <div class="bar"
-            style="width: 100%;height: @Percent%; background-color: @ForegroundColor; top: @(100 - Percent)%; "></div>
+             style="width: 100%;height: @Percent%; background-color: @DeckButtonConfig.ForegroundColor; top: @(100 - Percent)%; "></div>
     }
     else
     {
         <div class="bar"
-            style="width: @(Percent)%;height: 100%; background-color: @ForegroundColor;  "></div>
+             style="width: @(Percent)%;height: 100%; background-color: @DeckButtonConfig.ForegroundColor;  "></div>
     }
 </div>
 
 @code {
 
-    [Parameter] public float Percent { get; set; }
-    [Parameter] public PageConfig PageConfig { get; set; }
-    [Parameter] public ButtonConfig ButtonConfig { get; set; }
+    [Parameter]
+    public float Percent
+    {
+        get;
+        set
+        {
+            field = value;
+            ActivateButtonAction(new KeyValuePair<string, object>("percent", value));
+        }
+    }
+
     [Parameter] public bool Vertical { get; set; } = false;
     [Parameter] public string Class { get; set; }
     [Parameter] public string Style { get; set; }
 
-    [Parameter] public string ForegroundColor { get; set; } = Color.DarkBlue.ToHex();
-    [Parameter] public string BackgroundColor { get; set; } = Color.Gray.ToHex();
 
     private ElementReference _root;
+    private SliderConfig _sliderConfig;
+    private SliderState _sliderState;
     BoundingClientRect _boundingClientRect;
 
     protected override Task OnInitializedAsync()
     {
-        var gridColumn = $"{ButtonConfig.X} / {ButtonConfig.X + ButtonConfig.Width}";
-        var gridRow = $"{ButtonConfig.Y} / {ButtonConfig.Y + ButtonConfig.Height}";
-        Style = $"grid-column:{gridColumn}; grid-row:{gridRow}";
-        Vertical = ButtonConfig.Config["Vertical"].GetValue<bool>();
-        float percent = 0;
-        var percentMaybe = ButtonConfig.State["percent"]?.GetValue<float>();
-        if (percentMaybe is not null)
+        if (DeckButtonConfig.Config is SliderConfig config)
         {
-            Percent = percentMaybe.Value;
+            _sliderConfig = config;
+        }
+        else
+        {
+            throw new Exception("Failed to convert slider config into its type");
         }
 
-        ButtonConfig.OnStateChanged += OnButtonStateChanged;
+        Vertical = _sliderConfig.Vertical;
+
+        _sliderState = DeckButtonConfig.GetState<SliderState>();
+
+        var gridColumn = $"{DeckButtonConfig.X} / {DeckButtonConfig.X + DeckButtonConfig.Width}";
+        var gridRow = $"{DeckButtonConfig.Y} / {DeckButtonConfig.Y + DeckButtonConfig.Height}";
+        Style = $"grid-column:{gridColumn}; grid-row:{gridRow}";
+
+
+        Percent = _sliderState.Percent;
+
+        DeckButtonConfig.OnStateChanged += OnButtonStateChanged;
 
 
         return base.OnInitializedAsync();
@@ -63,11 +86,7 @@
 
     private void OnButtonStateChanged()
     {
-        var percentMaybe = ButtonConfig.State["percent"]?.GetValue<float>();
-        if (percentMaybe is not null)
-        {
-            Percent = percentMaybe.Value;
-        }
+        Percent = _sliderState.Percent;
 
         InvokeAsync(StateHasChanged);
     }
@@ -80,8 +99,9 @@
         _boundingClientRect = await JS.InvokeAsync<BoundingClientRect>("getBoundingClientRectInterop", _root);
 
         Percent = MathF.Abs(CalculatePercent(args)) * 100;
-        ButtonConfig.State["percent"] = Percent;
-        ButtonConfig?.OnStateChanged.Invoke();
+        _sliderState.Percent = Percent;
+
+        DeckButtonConfig?.OnStateChanged.Invoke();
 
         Input.OnPointerMove += OnPointerMove;
         Input.OnPointerUp += OnPointerUp;
@@ -95,8 +115,8 @@
         }
 
         Percent = MathF.Abs(CalculatePercent(move)) * 100;
-        ButtonConfig.State["percent"] = Percent;
-        ButtonConfig?.OnStateChanged.Invoke();
+        _sliderState.Percent = Percent;
+        DeckButtonConfig?.OnStateChanged.Invoke();
     }
 
     private float CalculatePercent(PointerEventArgs pointerEvent)
@@ -130,7 +150,12 @@
     public async ValueTask DisposeAsync()
     {
         if (Input != null) await Input.DisposeAsync();
-        ButtonConfig.OnStateChanged -= OnButtonStateChanged;
+        DeckButtonConfig.OnStateChanged -= OnButtonStateChanged;
+    }
+
+    public override void ActivateButtonAction(params KeyValuePair<string, object>[] args)
+    {
+        StreamerbotClient.DoAction(DeckButtonConfig.StreamerBotActionId, args);
     }
 
 }

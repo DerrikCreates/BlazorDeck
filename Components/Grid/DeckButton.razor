@@ -1,0 +1,134 @@
+@using System.Text
+@using BlazorDeck.Components.Config.ButtonTypes
+@using BlazorDeck.Components.Config.States
+@using BlazorDeck.Components.ExtentionMethods
+@using Microsoft.AspNetCore.Components.Rendering
+@using StreamerbotClient
+@using Color = System.Drawing.Color
+@inject Streamerbot StreamerbotClient
+@implements IAsyncDisposable
+@inherits DeckButtonBase
+<style>
+    .deck-button-dynamic {
+
+
+        color: @TextColor;
+    }
+
+
+</style>
+
+<div style="@BuildStyle()" onpointerdown="@OnPointerDown" onpointerup="@OnPointerUp"
+     class="deck-button deck-button-dynamic">
+    @{
+        <div
+            style=" width: 100%; height: 100%; display: grid; background-color:@(_pressButtonState.IsHeld ? DeckButtonConfig.InteractColor : DeckButtonConfig.ForegroundColor);">
+            <div style="grid-column: 1/1;grid-row: 1/1; font-size: 1rem">CONTENT</div>
+
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter] public string BackGroundColor { get; set; } = Color.Navy.ToHex();
+    [Parameter] public string TextColor { get; set; } = Color.White.ToHex();
+
+    private PressButtonState _pressButtonState;
+    private PressButtonConfig _pressButtonConfig;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pressButtonState = DeckButtonConfig.GetState<PressButtonState>();
+
+        if (DeckButtonConfig.Config is PressButtonConfig config)
+        {
+            _pressButtonConfig = config;
+        }
+        else
+        {
+            throw new Exception("Failed to convert press button config to its type");
+        }
+
+        DeckButtonConfig.OnStateChanged += OnStateChanged;
+        await base.OnInitializedAsync();
+    }
+
+    //state has been changed by us or another device
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private string BuildStyle()
+    {
+        StringBuilder sb = new();
+        if (_pressButtonState.IsHeld)
+        {
+            sb.Append($"background-color:{DeckButtonConfig.InteractColor};");
+        }
+        else
+        {
+            sb.Append($"background-color:{DeckButtonConfig.ForegroundColor};");
+        }
+
+        return sb.ToString();
+    }
+
+
+    private async Task OnPointerDown(PointerEventArgs down)
+    {
+        if (_pressButtonState.IsOnCooldown)
+        {
+            _pressButtonState.IsHeld = false;
+            return;
+        }
+
+        _pressButtonState.IsHeld = true;
+        DeckButtonConfig.OnStateChanged?.Invoke();
+
+
+        for (int i = 0; i < (_pressButtonConfig.ActivateTime); i += 100)
+        {
+            Console.WriteLine($"Holding :{i}");
+            await Task.Delay(100);
+            if (!_pressButtonState.IsHeld)
+            {
+                _pressButtonState.CurrentHoldTime = 0;
+                DeckButtonConfig.OnStateChanged?.Invoke();
+                return;
+            }
+
+            DeckButtonConfig.OnStateChanged?.Invoke();
+            _pressButtonState.CurrentHoldTime += 100;
+        }
+
+
+        if (_pressButtonState.IsHeld)
+        {
+            ActivateButtonAction();
+            Console.WriteLine("ACTIVATE STREAMERBOT ACTION");
+            _pressButtonState.CooldownStartTime = DateTime.UtcNow;
+            _pressButtonState.CooldownEndTime = DateTime.UtcNow.AddSeconds(_pressButtonConfig.ButtonCooldown);
+            _pressButtonState.IsHeld = false;
+            DeckButtonConfig.OnStateChanged?.Invoke();
+        }
+    }
+
+    private void OnPointerUp(PointerEventArgs up)
+    {
+        _pressButtonState.IsHeld = false;
+        DeckButtonConfig.OnStateChanged?.Invoke();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        DeckButtonConfig.OnStateChanged -= OnStateChanged;
+    }
+
+    public override void ActivateButtonAction(params KeyValuePair<string, object>[] args)
+    {
+        StreamerbotClient.DoAction(DeckButtonConfig.StreamerBotActionId, args);
+    }
+
+}

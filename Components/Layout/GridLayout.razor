@@ -2,13 +2,49 @@
 @inherits LayoutComponentBase
 @inject IJSRuntime JS;
 <BlazorDeckComponents/>
+@* Required *@
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
 
 <style>
-    body{
+    html {
+        font-size: 16px;
+    }
+
+    @@media (max-width: 1200px){
+
+    html {
+        font-size: 12px
+    }
+
+    }
+
+    @@media (max-width: 1000px){
+
+        html {
+            font-size: 10px
+        }
+
+    }
+
+    @@media (max-width: 800px) {
+    html {
+        font-size: 8px;
+    }
+    }
+
+    body {
         background-color: #0e0e0e;
+
     }
 </style>
-    
+
 @Body
 
 @code

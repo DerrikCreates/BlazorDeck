@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using BlazorDeck.Services;
 
 namespace BlazorDeck.Components.Config;
 
@@ -9,5 +10,14 @@ public class PageConfig
     public string Name { get; set; }
     public int GridSizeX { get; set; }
     public int GridSizeY { get; set; }
-    public List<ButtonConfig> Buttons { get; set; }
+    public List<DeckButtonConfig> Buttons { get; set; } = [];
+
+    public void Setup( ButtonStateService buttonStateService)
+    {
+        foreach (var button in Buttons)
+        {
+            
+            button.Setup(buttonStateService);
+        }
+    }
 }
