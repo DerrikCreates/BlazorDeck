@@ -19,7 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\StreamerbotClient\StreamerbotClient\StreamerbotClient.csproj" />
+      <ProjectReference Include="..\StreamerbotClient\StreamerbotClient.csproj" />
     </ItemGroup>
+
+   
 
 </Project>
