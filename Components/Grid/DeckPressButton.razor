@@ -2,28 +2,30 @@
 @using BlazorDeck.Components.Config.ButtonTypes
 @using BlazorDeck.Components.Config.States
 @using BlazorDeck.Components.ExtentionMethods
+@using BlazorDeck.Services
 @using Microsoft.AspNetCore.Components.Rendering
 @using StreamerbotClient
+@using ButtonType = BlazorDeck.Components.Config.ButtonType
 @using Color = System.Drawing.Color
 @inject Streamerbot StreamerbotClient
 @implements IAsyncDisposable
 @inherits DeckButtonBase
 <style>
-    .deck-button-dynamic {
-
-
-        color: @TextColor;
-    }
 
 
 </style>
 
 <div style="@BuildStyle()" onpointerdown="@OnPointerDown" onpointerup="@OnPointerUp"
-     class="deck-button deck-button-dynamic">
+     class="deck-button">
     @{
         <div
             style=" width: 100%; height: 100%; display: grid; background-color:@(_pressButtonState.IsHeld ? DeckButtonConfig.InteractColor : DeckButtonConfig.ForegroundColor);">
-            <div style="grid-column: 1/1;grid-row: 1/1; font-size: 1rem">CONTENT</div>
+            <div style="grid-column: 1/1;grid-row: 1/1; font-size: 1rem">
+                <div
+                    style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: @DeckButtonConfig.TextColor;">
+                    @DeckButtonConfig.Text
+                </div>
+            </div>
 
         </div>
     }
@@ -31,15 +33,17 @@
 
 @code {
 
-    [Parameter] public string BackGroundColor { get; set; } = Color.Navy.ToHex();
-    [Parameter] public string TextColor { get; set; } = Color.White.ToHex();
+    [Parameter] public Action<Guid> OnPageSelect { get; set; }
 
     private PressButtonState _pressButtonState;
     private PressButtonConfig _pressButtonConfig;
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnParametersSetAsync()
     {
-        _pressButtonState = DeckButtonConfig.GetState<PressButtonState>();
+        await base.OnParametersSetAsync();
+        _pressButtonState = (PressButtonState)ButtonState;
+        
 
         if (DeckButtonConfig.Config is PressButtonConfig config)
         {
@@ -51,7 +55,6 @@
         }
 
         DeckButtonConfig.OnStateChanged += OnStateChanged;
-        await base.OnInitializedAsync();
     }
 
     //state has been changed by us or another device
@@ -109,7 +112,7 @@
             ActivateButtonAction();
             Console.WriteLine("ACTIVATE STREAMERBOT ACTION");
             _pressButtonState.CooldownStartTime = DateTime.UtcNow;
-            _pressButtonState.CooldownEndTime = DateTime.UtcNow.AddSeconds(_pressButtonConfig.ButtonCooldown);
+            _pressButtonState.CooldownEndTime = DateTime.UtcNow.AddMilliseconds(_pressButtonConfig.ButtonCooldown);
             _pressButtonState.IsHeld = false;
             DeckButtonConfig.OnStateChanged?.Invoke();
         }
@@ -128,7 +131,16 @@
 
     public override void ActivateButtonAction(params KeyValuePair<string, object>[] args)
     {
-        StreamerbotClient.DoAction(DeckButtonConfig.StreamerBotActionId, args);
+        if (DeckButtonConfig.StreamerBotActionId != Guid.Empty)
+        {
+            StreamerbotClient.DoAction(DeckButtonConfig.StreamerBotActionId, args);
+        }
+
+
+        if (_pressButtonConfig.PageToSwapTo != Guid.Empty)
+        {
+            OnPageSelect?.Invoke(_pressButtonConfig.PageToSwapTo);
+        }
     }
 
 }

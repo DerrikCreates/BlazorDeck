@@ -31,6 +31,7 @@ public class ClientInputInterop : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        Console.WriteLine("INPUT INTEROP DISPOSED");
         _dotNetObjectReference.Dispose();
         await _module.DisposeAsync();
     }

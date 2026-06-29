@@ -5,7 +5,7 @@ namespace BlazorDeck;
 
 public class BlazorDeckConfig
 {
-    public List<PageConfig> BlazorDeckPages { get; set; }
+    public List<PageConfig> BlazorDeckPages { get; set; } = [];
 
     public void Save()
     {

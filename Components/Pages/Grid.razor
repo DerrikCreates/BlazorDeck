@@ -43,10 +43,13 @@
         switch (button.ButtonType)
         {
             case ButtonType.Button:
-                <DeckButton DeckButtonConfig="@button" PageConfig="@CurrentPage"/>
+                <DeckPressButton OnPageSelect="OnPageSelect" DeckButtonConfig="@button" PageConfig="@CurrentPage"/>
                 break;
             case ButtonType.Slider:
                 <DeckSlider DeckButtonConfig="@button" PageConfig="@CurrentPage"/>
+                break;
+            case ButtonType.DragArea:
+                <DeckDragArea DeckButtonConfig="@button" PageConfig="@CurrentPage"/>
                 break;
         }
     }
@@ -58,17 +61,29 @@
 
     PageConfig CurrentPage;
 
+    private Dictionary<Guid, PageConfig> pages = [];
+
     protected override void OnInitialized()
     {
         ConfigWatcher.OnConfigChanged += config =>
         {
             var page = config.BlazorDeckPages.First();
-            page.Setup(ButtonStateService);
+            pages.Clear();
+
+            foreach (var deckPage in config.BlazorDeckPages)
+            {
+                pages.TryAdd(deckPage.Id, deckPage);
+            }
+
+
             OnPageChanged(page);
         };
+        foreach (var deckPage in ConfigWatcher.GetConfig().BlazorDeckPages)
+        {
+            pages.TryAdd(deckPage.Id, deckPage);
+        }
 
         var first = ConfigWatcher.GetConfig().BlazorDeckPages.First();
-        first.Setup(ButtonStateService);
         OnPageChanged(first);
     }
 
@@ -99,6 +114,17 @@
     public async ValueTask DisposeAsync()
     {
         CurrentPage.OnStateChanged -= PageStateChanged;
+    }
+
+    private void OnPageSelect(Guid pageId)
+    {
+        var page = pages[pageId];
+        if (page is null)
+        {
+            return;
+        }
+        
+        OnPageChanged(page);
     }
 }
 

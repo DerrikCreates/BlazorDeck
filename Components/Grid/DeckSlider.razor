@@ -20,17 +20,28 @@
     };
 </script>
 
-<div @onpointerdown="@OnPointerDown" class=@($"slider {Class}") style="@Style; overflow: hidden" @ref="_root">
-    @if (Vertical)
-    {
-        <div class="bar"
-             style="width: 100%;height: @Percent%; background-color: @DeckButtonConfig.ForegroundColor; top: @(100 - Percent)%; "></div>
-    }
-    else
-    {
-        <div class="bar"
-             style="width: @(Percent)%;height: 100%; background-color: @DeckButtonConfig.ForegroundColor;  "></div>
-    }
+<div @onpointerdown="@OnPointerDown" class=@($"slider {Class}")
+     style="@Style; overflow: hidden; background-color: @DeckButtonConfig.BackgroundColor" @ref="_root">
+    <div style="display: grid; width: 100%;height: 100%">
+        <div
+            style="display: flex; z-index: 1;color: @DeckButtonConfig.TextColor; grid-column: 1/1; grid-row: 1/1; justify-content: @DeckButtonConfig.TextAlign; align-items: @DeckButtonConfig.TextAlign">
+            <div>@DeckButtonConfig.Text</div>
+        </div>
+        <div style="grid-column: 1/1; grid-row: 1/1">
+            @if (Vertical)
+            {
+                <div class="bar"
+                     style="width: 100%;height: @Percent%; background-color: @DeckButtonConfig.ForegroundColor; top: @(100 - Percent)%; "></div>
+            }
+            else
+            {
+                <div class="bar"
+                     style="width: @(Percent)%;height: 100%; background-color: @DeckButtonConfig.ForegroundColor;  "></div>
+            }
+        </div>
+
+    </div>
+
 </div>
 
 @code {
@@ -56,32 +67,30 @@
     private SliderState _sliderState;
     BoundingClientRect _boundingClientRect;
 
-    protected override Task OnInitializedAsync()
+   
+    protected override async Task OnParametersSetAsync()
     {
+        await base.OnParametersSetAsync();
+        _sliderState = (SliderState)ButtonState;
+
         if (DeckButtonConfig.Config is SliderConfig config)
         {
             _sliderConfig = config;
         }
         else
         {
-            throw new Exception("Failed to convert slider config into its type");
+            throw new Exception("Failed to convert press button config to its type");
         }
 
         Vertical = _sliderConfig.Vertical;
 
-        _sliderState = DeckButtonConfig.GetState<SliderState>();
 
-        var gridColumn = $"{DeckButtonConfig.X} / {DeckButtonConfig.X + DeckButtonConfig.Width}";
-        var gridRow = $"{DeckButtonConfig.Y} / {DeckButtonConfig.Y + DeckButtonConfig.Height}";
-        Style = $"grid-column:{gridColumn}; grid-row:{gridRow}";
+        CaculateGridPos();
 
 
         Percent = _sliderState.Percent;
 
         DeckButtonConfig.OnStateChanged += OnButtonStateChanged;
-
-
-        return base.OnInitializedAsync();
     }
 
     private void OnButtonStateChanged()
@@ -149,7 +158,6 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (Input != null) await Input.DisposeAsync();
         DeckButtonConfig.OnStateChanged -= OnButtonStateChanged;
     }
 

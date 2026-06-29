@@ -30,10 +30,15 @@ public class ButtonStateService
             //TODO: check if the type of the button has changed,
             // if it has remove the old state and create new 
             case ButtonType.Button:
-                State.TryAdd(id, new PressButtonState());
+                var btn = new PressButtonState();
+                State.TryAdd(id, btn);
                 break;
             case ButtonType.Slider:
-                State.TryAdd(id, new SliderState());
+                var slider = new SliderState();
+                State.TryAdd(id, slider);
+                break;
+            case ButtonType.DragArea:
+                State.TryAdd(id, new DragAreaState());
                 break;
         }
     }

@@ -12,12 +12,5 @@ public class PageConfig
     public int GridSizeY { get; set; }
     public List<DeckButtonConfig> Buttons { get; set; } = [];
 
-    public void Setup( ButtonStateService buttonStateService)
-    {
-        foreach (var button in Buttons)
-        {
-            
-            button.Setup(buttonStateService);
-        }
-    }
+   
 }

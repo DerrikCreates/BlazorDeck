@@ -1,60 +1,163 @@
 {
   "BlazorDeckPages": [
     {
-      "Id": "4a643052-cab5-4cd0-902c-a96d14cde78d",
-      "Name": "FUCKING WORK",
+      "Id": "0f0c3e41-1746-4115-9b8d-73479312e2e5",
+      "Name": null,
       "GridSizeX": 8,
       "GridSizeY": 4,
       "Buttons": [
         {
-          "Id": "28298a76-fffa-4f37-aeae-efa048a2c615",
-          "StreamerBotActionId": "f7a567db-bf60-40bc-9ca5-a29e5a9ebb73",
-          "ButtonType": 1,
-          "BackgroundColor": "#000000",
-          "ForegroundColor": "#1A5FD8",
-          "InteractColor": "#8B0000",
-          "Config": {
-            "$type": 1,
-            "Vertical": true
-          },
-          "X": 1,
-          "Y": 1,
-          "Width": 1,
-          "Height": 4
-        },
-        {
-          "Id": "5ba75eed-fdae-4565-ab28-e2aca0867e8c",
+          "Text": "Button 1",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "d9919ea3-3446-4229-b9ac-c42fc2df55d2",
           "StreamerBotActionId": "2b8750c1-38ba-4564-8daa-1d6afa79d86c",
           "ButtonType": 0,
-          "BackgroundColor": "#000000",
-          "ForegroundColor": "#1A5FD8",
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
           "InteractColor": "#8B0000",
           "Config": {
             "$type": 0,
             "ActivateTime": 0,
             "ActivateReadyColor": "#0000FF",
-            "ButtonCooldown": 1
+            "ButtonCooldown": 200,
+            "PageToSwapTo": "00000000-0000-0000-0000-000000000000"
           },
-          "X": 2,
+          "X": 1,
+          "Y": 1,
+          "Width": 1,
+          "Height": 1
+        },
+        {
+          "Text": "Button 2",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "a364d745-ae85-4664-855e-27af59d0fcc8",
+          "StreamerBotActionId": "38eb0d7a-17e3-4651-93fc-a7aa5eee9d8f",
+          "ButtonType": 0,
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#197FEC",
+          "Config": {
+            "$type": 0,
+            "ActivateTime": 1000,
+            "ActivateReadyColor": "",
+            "ButtonCooldown": 0,
+            "PageToSwapTo": "00000000-0000-0000-0000-000000000000"
+          },
+          "X": 1,
           "Y": 2,
           "Width": 1,
           "Height": 1
         },
         {
-          "Id": "95e2f35b-b277-4e11-b8b0-88519505c051",
-          "StreamerBotActionId": "38eb0d7a-17e3-4651-93fc-a7aa5eee9d8f",
+          "Text": "Page 2",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "4bb838c3-ec46-410b-a2ac-4a1b19c8f942",
+          "StreamerBotActionId": "00000000-0000-0000-0000-000000000000",
           "ButtonType": 0,
-          "BackgroundColor": "#000000",
-          "ForegroundColor": "#1A5FD8",
-          "InteractColor": "#FFFF00",
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#197FEC",
           "Config": {
             "$type": 0,
             "ActivateTime": 1000,
-            "ActivateReadyColor": "#0000FF",
-            "ButtonCooldown": 1
+            "ActivateReadyColor": "",
+            "ButtonCooldown": 0,
+            "PageToSwapTo": "bc862ef4-a046-41ff-97eb-3b974be72276"
           },
-          "X": 3,
+          "X": 1,
+          "Y": 2,
+          "Width": 1,
+          "Height": 1
+        },
+        {
+          "Text": "Slider",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "fd5dc58a-4f36-4d4b-a81f-d2b3b0cb1bf8",
+          "StreamerBotActionId": "f7a567db-bf60-40bc-9ca5-a29e5a9ebb73",
+          "ButtonType": 1,
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#8B0000",
+          "Config": {
+            "$type": 1,
+            "Vertical": true
+          },
+          "X": 2,
+          "Y": 1,
+          "Width": 1,
+          "Height": 4
+        },
+        {
+          "Text": "Drag Area",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "2000d442-bbc1-483f-a40a-71fe7d59c926",
+          "StreamerBotActionId": "a31bb086-3e9c-4a18-b5c7-fece29665b69",
+          "ButtonType": 2,
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#8B0000",
+          "Config": {
+            "$type": 2
+          },
+          "X": 4,
+          "Y": 1,
+          "Width": 4,
+          "Height": 4
+        }
+      ]
+    },
+    {
+      "Id": "bc862ef4-a046-41ff-97eb-3b974be72276",
+      "Name": null,
+      "GridSizeX": 8,
+      "GridSizeY": 4,
+      "Buttons": [
+        {
+          "Text": "Main Page",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "93ccce42-988f-43bb-88ad-0158133af2a3",
+          "StreamerBotActionId": "00000000-0000-0000-0000-000000000000",
+          "ButtonType": 0,
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#197FEC",
+          "Config": {
+            "$type": 0,
+            "ActivateTime": 1000,
+            "ActivateReadyColor": "",
+            "ButtonCooldown": 0,
+            "PageToSwapTo": "0f0c3e41-1746-4115-9b8d-73479312e2e5"
+          },
+          "X": 1,
           "Y": 4,
+          "Width": 1,
+          "Height": 1
+        },
+        {
+          "Text": "Page 2 Button",
+          "TextColor": "#fff",
+          "TextAlign": 2,
+          "Id": "27a01aaf-cafb-4a71-b20f-96000397f6d7",
+          "StreamerBotActionId": "76b8fdf3-d546-42e9-bf33-ee53ae5fa032",
+          "ButtonType": 0,
+          "BackgroundColor": "#1F1D27",
+          "ForegroundColor": "#2444AB",
+          "InteractColor": "#8B0000",
+          "Config": {
+            "$type": 0,
+            "ActivateTime": 0,
+            "ActivateReadyColor": "",
+            "ButtonCooldown": 100,
+            "PageToSwapTo": "00000000-0000-0000-0000-000000000000"
+          },
+          "X": 1,
+          "Y": 1,
           "Width": 1,
           "Height": 1
         }
