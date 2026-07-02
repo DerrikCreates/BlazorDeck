@@ -7,7 +7,7 @@
 @using StreamerbotClient
 @using ButtonType = BlazorDeck.Components.Config.ButtonType
 @using Color = System.Drawing.Color
-@inject Streamerbot StreamerbotClient
+@inject StreamerBotClient StreamerbotClient
 @implements IAsyncDisposable
 @inherits DeckButtonBase
 <style>
@@ -129,7 +129,7 @@
         DeckButtonConfig.OnStateChanged -= OnStateChanged;
     }
 
-    public override void ActivateButtonAction(params KeyValuePair<string, object>[] args)
+    public override void ActivateButtonAction(params (string, object)[] args)
     {
         if (DeckButtonConfig.StreamerBotActionId != Guid.Empty)
         {

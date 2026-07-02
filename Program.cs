@@ -29,7 +29,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ButtonStateService>();
 
-var streamerBot = new Streamerbot();
+var streamerBot = new StreamerBotClient();
 streamerBot.Connect(builder.Configuration["StreamerBotURI"], "*");
 builder.Services.AddSingleton(streamerBot);
 
@@ -37,6 +37,7 @@ builder.Services.AddSingleton(streamerBot);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped<DOMHelper>();
 builder.Services.AddScoped<ClientInputInterop>();
 
 builder.Services.AddSingleton<ConfigWatcher>();

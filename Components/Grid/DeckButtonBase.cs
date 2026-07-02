@@ -30,7 +30,7 @@ public abstract class DeckButtonBase : ComponentBase
     }
 
 
-    public abstract void ActivateButtonAction(params KeyValuePair<string, object>[] args);
+    public abstract void ActivateButtonAction(params (string name, object data)[] args);
 
     public string GridStyle { get; set; }
 

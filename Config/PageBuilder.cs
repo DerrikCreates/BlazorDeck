@@ -69,7 +69,7 @@ public class PageBuilder
 
         var area1 = new ButtonBuilder()
             .DefineArea()
-            .Position(4, 1)
+            .Position(5, 1)
             .Size(4, 4)
             .SetText("Drag Area")
             .StreamerBotAction(new Guid("a31bb086-3e9c-4a18-b5c7-fece29665b69"));

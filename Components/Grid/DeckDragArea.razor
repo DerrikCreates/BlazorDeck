@@ -1,38 +1,84 @@
 @using BlazorDeck.Components.Config.ButtonTypes
 @using BlazorDeck.Config.States
+@using BlazorDeck.Services
+@using MudBlazor.Extensions
 @using StreamerbotClient
 @inherits DeckButtonBase
-@inject Streamerbot StreamerBot;
-<MudSwipeArea Style="@GridStyle" Class="border-dashed border-2 mud-border-primary"
-              OnSwipeMove="OnMove">
-    <div style="width: 100%;height:100%;display: flex;
-        color: @DeckButtonConfig.TextColor;
-    justify-content: @DeckButtonConfig.TextAlign; align-items: @DeckButtonConfig.TextAlign">
-        @DeckButtonConfig.Text
+@inject DOMHelper DOMHelper;
+@inject StreamerBotClient StreamerBot;
+<MudSwipeArea @ref="_swipeArea" Style="@GridStyle" Class="border-dashed border-2 mud-border-primary"
+              OnSwipeMove="OnMove" OnSwipeEnd="OnEnd">
+    <div style="display: grid; width: 100%;height: 100%">
+        <div
+            style="position: relative;background-color: red;grid-column: 1/1;grid-row: 1/1;  left: @(_dragAreaState.XPercent * 100)%; top: @(_dragAreaState.YPercent * 100)%; width: 50px; height: 50px; transform: translate(-50%,-50%)"></div>
+
+        <div @ref="_swipeRef" style="width: 100%;height:100%;display: flex; grid-column: 1/1; grid-row: 1/1;
+            color: @DeckButtonConfig.TextColor;
+        justify-content: @DeckButtonConfig.TextAlign; align-items: @DeckButtonConfig.TextAlign">
+            @DeckButtonConfig.Text
+        </div>
     </div>
+
 </MudSwipeArea>
 
 @code {
 
+    MudSwipeArea _swipeArea;
+    ElementReference _swipeRef;
     [Parameter] public bool ShowIcon { get; set; } = true;
+
+    private ElementReference _reference;
 
     private DragAreaState _dragAreaState;
     private DragAreaConfig _dragAreaConfig;
 
-    private void OnMove(MultiDimensionSwipeEventArgs move)
+
+    DateTime nextSend = DateTime.Now.AddMilliseconds(16);
+
+    private async void OnMove(MultiDimensionSwipeEventArgs move)
     {
-        ActivateButtonAction(new KeyValuePair<string, object>("delta", new { x = move.SwipeDeltas[0], y = move.SwipeDeltas[1] }));
+        //var rect = await DOMHelper.GetBoundingClientRect(_swipeArea);
+
+        if (nextSend <= DateTime.Now)
+        {
+            await CalculateState(move.TouchEventArgs);
+            nextSend = DateTime.Now.AddMilliseconds(16);
+        }
     }
 
-    public override void ActivateButtonAction(params KeyValuePair<string, object>[] args)
+    private async Task CalculateState(PointerEventArgs move)
+    {
+        var touch = move;
+
+        var rect = await DOMHelper.GetBoundingClientRect(_swipeRef);
+
+
+        var x = touch.PageX - rect.Left;
+        var y = touch.PageY - rect.Top;
+
+        var xPercent = double.Clamp(x / rect.Width, 0, 1);
+        var yPercent = double.Clamp(y / rect.Height, 0, 1);
+
+
+        _dragAreaState.XPercent = xPercent;
+        _dragAreaState.YPercent = yPercent;
+
+        DeckButtonConfig.OnStateChanged?.Invoke();
+        ActivateButtonAction(("percent", new { X = xPercent, Y = yPercent }));
+    }
+
+    public override void ActivateButtonAction(params (string name, object data)[] args)
     {
         StreamerBot.DoAction(DeckButtonConfig.StreamerBotActionId, args);
     }
 
     protected override async Task OnInitializedAsync()
     {
+        DeckButtonConfig.OnStateChanged += () => { InvokeAsync(StateHasChanged); };
+        await base.OnInitializedAsync();
         CaculateGridPos();
     }
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -48,6 +94,11 @@
         {
             throw new Exception("Failed to convert drag area config to its type");
         }
+    }
+
+    private async Task OnEnd(SwipeEventArgs obj)
+    {
+        await CalculateState(obj.TouchEventArgs);
     }
 
 }

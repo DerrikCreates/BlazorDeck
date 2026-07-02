@@ -1,4 +1,6 @@
+@using BlazorDeck.Services
 @inject ClientInputInterop InputInterop
+@inject DOMHelper DomHelper;
 @rendermode @(new InteractiveServerRenderMode(false))
 
 @code {
@@ -8,6 +10,7 @@
         if (firstRender)
         {
             await InputInterop.Init();
+            await DomHelper.Init();
         }
     }
 
